@@ -9,6 +9,7 @@ VALUE CMouse = Qnil;
 void Init_CMouse();
 
 VALUE method_get_mouse_x(VALUE self);
+VALUE method_get_mouse_y(VALUE self);
 VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y);
 VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y);
 
@@ -16,6 +17,7 @@ VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y);
 void Init_CMouse() {
   CMouse = rb_define_module("CMouse");
   rb_define_method(CMouse, "get_mouse_x", method_get_mouse_x, 0);
+  rb_define_method(CMouse, "get_mouse_y", method_get_mouse_y, 0);
   rb_define_method(CMouse, "set_mouse_rel", method_set_mouse_rel, 2);
   rb_define_method(CMouse, "set_mouse_abs", method_set_mouse_abs, 2);
   initialize_screen();
@@ -45,6 +47,11 @@ int initialize_screen() {
 }
 
 VALUE method_get_mouse_x(VALUE self) {
+  int x = 10;
+  return INT2NUM(x);
+}
+
+VALUE method_get_mouse_y(VALUE self) {
   int x = 10;
   return INT2NUM(x);
 }
