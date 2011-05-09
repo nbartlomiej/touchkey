@@ -14,7 +14,7 @@ References:
 #### Running:
 
 Dependencies:
-1. Linux OS
+1. Linux OS or OSX
 2. libxtst-dev
 
 1) bundle install

@@ -8,3 +8,7 @@ Makefile
 
 # logs apropos makefile creation
 mkmf.log
+
+# osx compilation files
+*.bundle
+conftest.dSYM/
