@@ -47,13 +47,15 @@ int initialize_screen() {
 }
 
 VALUE method_get_mouse_x(VALUE self) {
-  int x = 10;
-  return INT2NUM(x);
+  XEvent event;
+  XQueryPointer(display, RootWindow(display, DefaultScreen(display)), &event.xbutton.root, &event.xbutton.window, &event.xbutton.x_root, &event.xbutton.y_root, &event.xbutton.x, &event.xbutton.y, &event.xbutton.state);
+  return INT2NUM(event.xbutton.x_root);
 }
 
 VALUE method_get_mouse_y(VALUE self) {
-  int x = 10;
-  return INT2NUM(x);
+  XEvent event;
+  XQueryPointer(display, RootWindow(display, DefaultScreen(display)), &event.xbutton.root, &event.xbutton.window, &event.xbutton.x_root, &event.xbutton.y_root, &event.xbutton.x, &event.xbutton.y, &event.xbutton.state);
+  return INT2NUM(event.xbutton.y_root);
 }
 
 VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y){
@@ -62,6 +64,7 @@ VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y){
 }
 
 VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y){
+  // XWarpPointer(display, None, None, 0, 0, 0, 0, NUM2INT(x), NUM2INT(y));
   XTestFakeMotionEvent(display, screen, NUM2INT(x), NUM2INT(y), 0);
   XSync(display, 1);
 }
