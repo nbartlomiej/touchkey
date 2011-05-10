@@ -7,6 +7,8 @@ It's an attempt to turn keyboard into a touchpad. It might not turn out to funct
 Helpful links:
 * Crating ruby extensions in C: http://www.rubyinside.com/how-to-create-a-ruby-extension-in-c-in-under-5-minutes-100.html
 * Simple C program for manipulating pointer position in Linux: http://www.isv.uu.se/~ziemann/xevent/
+* Introduction to ruby intperpreter's C internals: http://rhg.rubyforge.org/chapter02.html
+* Another introduction to ruby's C-side: http://people.apache.org/~rooneg/talks/ruby-extensions/ruby-extensions.html
 
 References:
 * Another approach: http://www.topology.org/linux/xcursor.html
