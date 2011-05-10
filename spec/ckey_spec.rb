@@ -3,18 +3,19 @@ require 'spec_helper'
 require 'CKey/CKey'
 include CKey
 
+class EventDispatcher
+end
+
 describe "CKey" do
 
-  describe ".set_event_dispatcher" do
-    ed = EventDispatcher.new
-    set_event_dispatcher(ed).should = true
-  end
-
-  describe "redirect event to the EventDispatcher" do
-    ed = EventDispatcher.new
-    set_event_dispatcher(ed).should = true
-    ed.stubs(:key_press).with('A').returns(true)
-    simulate_keypress('A')
+  describe "delegate event to the EventDispatcher" do
+    it "should invoke EventDispatcher's key_press" do
+      ed = EventDispatcher.new
+      set_event_dispatcher(ed)
+      ed.stub(:key_press).with('A'){ true }
+      ed.should_receive(:key_press).with('A')
+      simulate_keypress('A')
+    end
   end
 
 end
