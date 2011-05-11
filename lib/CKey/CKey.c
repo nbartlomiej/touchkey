@@ -7,11 +7,13 @@ VALUE CKey = Qnil;
 // Prototype for the initialization method
 void Init_CKey();
 
+VALUE method_start_event_loop(VALUE self);
 VALUE method_set_event_dispatcher(VALUE self, VALUE event_dispatcher);
 VALUE method_simulate_keypress(VALUE self, VALUE keycode);
 
 void Init_CKey() {
   CKey = rb_define_module("CKey");
+  rb_define_method(CKey, "start_event_loop", method_start_event_loop, 0);
   rb_define_method(CKey, "set_event_dispatcher", method_set_event_dispatcher, 1);
   rb_define_method(CKey, "simulate_keypress", method_simulate_keypress, 1);
   initialize_screen();
@@ -45,7 +47,13 @@ VALUE method_set_event_dispatcher(VALUE self, VALUE n_ed){
   event_dispatcher = n_ed;
 }
 
-VALUE method_simulate_keypress(VALUE self, VALUE keycode){
-  XTestFakeKeyEvent(display, NUM2INT(keycode), True, 0);
-  XTestFakeKeyEvent(display, NUM2INT(keycode), False, 0);
+VALUE method_start_event_loop(VALUE self){
+}
+
+VALUE method_simulate_keypress(VALUE self, VALUE key_string){
+  unsigned int keycode = XKeysymToKeycode(
+      display, XStringToKeysym(STR2CSTR(key_string))
+  );
+  XTestFakeKeyEvent(display, keycode, True, 0);
+  XTestFakeKeyEvent(display, keycode, False, 0);
 }
