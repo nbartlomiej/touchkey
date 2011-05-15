@@ -1,6 +1,6 @@
 ### Touchkey
 
-Version 0.02. IT DOES NOT WORK!!! (but it might someday, especially with your help)
+Version 0.03 (early prototype)
 
 It's an attempt to turn keyboard into a touchpad. It might not turn out to function exactly the same way, but should provide similar benefits (the ability to control a mouse pointer in a quick and precise way) with an additional one of not moving your hands off the keyboard.
 
@@ -22,3 +22,7 @@ Dependencies:
 1) bundle install
 2) rspec spec (compiles everything and runs tests)
 3) ruby ./bin/touchkey.rb
+
+#### Usage:
+
+Press Super key (a.k.a. windows key) and any letter/number key. Exit with Super-L.
