@@ -67,8 +67,9 @@ VALUE method_push_test(VALUE self, VALUE key, VALUE event_type){
 VALUE method_grab_keyboard(VALUE self, VALUE n_ed){
 
   // Two placeholders for the event loop; they will
-  // either hold the true value or a test value
-  // depending on whether a test_keycode is set
+  // either hold the actual value or a test value
+  // depending on whether a test is queued for
+  // execution (text_queued variable)
   int event_keycode;
   int event_type;
 
