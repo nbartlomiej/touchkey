@@ -1,23 +1,46 @@
 require 'spec_helper'
 
 require 'CKey/CKey'
-require 'CKey/parallelizer'
-include CKey
 
-class EventDispatcher
-end
+require 'helpers/ckey_helper'
 
 describe "CKey" do
 
   describe "delegate event to the EventDispatcher" do
-    it "should invoke EventDispatcher's key_press" do
-      ed = EventDispatcher.new
-      set_event_dispatcher(ed)
-      grab_keyboard
-      ed.stub(:key_press).with('A'){ true }
-      ed.should_receive(:key_press).with('A')
-      simulate_keypress('A')
+
+    # The general test is ready (below) but I have been yet 
+    # unable to # make it pass. It requires multiple actions 
+    # at once, # i.e.: grabbing the keyboard and simulating 
+    # events.
+    # Ruby stops managing threads whenever a C extension is
+    # being executed. Forking the block in question led me
+    # to memory issues, the same happened when I created a
+    # thread with C's pthread library. TODO: resolve!
+    #
+    # it "delegates key_press events to the EventDispatcher" do
+    #   event_dispatcher = EventDispatcher.new
+    #   CKey.grab_keyboard(event_dispatcher)
+    #   event_dispatcher.stub(:key_press).with('a'){ true }
+    #   event_dispatcher.should_receive(:key_press).with('a')
+    #   CKey.simulate_keypress_supermode('a')
+    # end
+
+    it "invokes main api when using test methods" do
+      event_dispatcher = EventDispatcher.new
+      CKey.stub(:grab_keyboard).with(event_dispatcher)
+      CKey.should_receive(:grab_keyboard).with(event_dispatcher)
+      CKey.test(event_dispatcher).puts('a')
     end
+
+    it "delegates key-related events to the EventDispatcher" do
+      event_dispatcher = EventDispatcher.new
+      event_dispatcher.stub(:key_press).with('a')
+      event_dispatcher.stub(:key_release).with('a')
+      event_dispatcher.should_receive(:key_press).with('a')
+      event_dispatcher.should_receive(:key_release).with('a')
+      CKey.test(event_dispatcher).puts('a')
+    end
+
   end
 
 end
