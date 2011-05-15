@@ -3,7 +3,7 @@
 $LOAD_PATH << "#{File.dirname(__FILE__)}/../lib"
 
 require 'CMouse/CMouse'
-include CMouse
+require 'CKey/CKey'
+require 'event_dispatcher'
 
-puts set_mouse_abs(100, 200)
-puts set_mouse_rel(100, 200)
+CKey.grab_keyboard(EventDispatcher.new)
