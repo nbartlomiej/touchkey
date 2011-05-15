@@ -16,10 +16,10 @@ VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y);
 // The initialization method for this module
 void Init_CMouse() {
   CMouse = rb_define_module("CMouse");
-  rb_define_method(CMouse, "get_mouse_x", method_get_mouse_x, 0);
-  rb_define_method(CMouse, "get_mouse_y", method_get_mouse_y, 0);
-  rb_define_method(CMouse, "set_mouse_rel", method_set_mouse_rel, 2);
-  rb_define_method(CMouse, "set_mouse_abs", method_set_mouse_abs, 2);
+  rb_define_singleton_method(CMouse, "get_mouse_x", method_get_mouse_x, 0);
+  rb_define_singleton_method(CMouse, "get_mouse_y", method_get_mouse_y, 0);
+  rb_define_singleton_method(CMouse, "set_mouse_rel", method_set_mouse_rel, 2);
+  rb_define_singleton_method(CMouse, "set_mouse_abs", method_set_mouse_abs, 2);
   initialize_screen();
 }
 
