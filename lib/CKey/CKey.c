@@ -10,6 +10,7 @@ void Init_CKey();
 
 VALUE method_grab_keyboard(VALUE self, VALUE event_dispatcher);
 VALUE method_push_test(VALUE self, VALUE key, VALUE event_type);
+VALUE method_push_test_wait(VALUE self, VALUE ticks);
 
 void grab_keyboard(void *args);
 
@@ -17,6 +18,7 @@ void Init_CKey() {
   CKey = rb_define_module("CKey");
   rb_define_singleton_method(CKey, "grab_keyboard", method_grab_keyboard, 1);
   rb_define_singleton_method(CKey, "push_test", method_push_test, 2);
+  rb_define_singleton_method(CKey, "push_test_wait", method_push_test_wait, 1);
   initialize_screen();
 }
 
@@ -53,16 +55,61 @@ int initialize_screen() {
   XGetGeometry( display, window, &ret_window, &x, &y, &width, &height, &border_width, &depth);
 }
 
+// is test key event triggered?
 int test_queued = False;
+
+// info about test key events
 VALUE test_key;
 VALUE test_event_type;
 
+// receiving test key event from outer (ruby) libraries
 VALUE method_push_test(VALUE self, VALUE key, VALUE event_type){
-  test_queued = True;
-  test_key = key;
+  test_queued     = True;
+  test_key        = key;
   test_event_type = event_type;
 }
 
+// test wait triggered for n ticks of time
+int test_wait_queued = 0;
+
+// receiving test wait from outer (ruby) libraries
+VALUE method_push_test_wait(VALUE self, VALUE ticks){
+  test_wait_queued = NUM2INT(ticks);
+}
+
+void process_key_event(int keycode , int type){
+  int quit_key = XKeysymToKeycode(display, quit_keysym);
+  int super_key = XKeysymToKeycode(display, super_keysym);
+
+  char * key = XKeysymToString( XKeycodeToKeysym(display, keycode, 0));
+  switch(type) {
+
+    case KeyPress:
+      if (keycode == super_key){
+        XGrabKeyboard(display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime);
+      } else {
+        // send key_press to the event_dispatcher
+        rb_funcall(event_dispatcher, rb_intern("key_press"), 1, rb_str_new2(key));
+      }
+      break;
+
+    case KeyRelease:
+      if (keycode == super_key){
+        XUngrabKeyboard(display, CurrentTime);
+      } else if (keycode == quit_key ){
+        // the quit key has been released, exiting the loop
+        should_release_keyboard = True ;
+      } else {
+        // send key_release to the event_dispatcher
+        rb_funcall(event_dispatcher, rb_intern("key_release"), 1, rb_str_new2(key));
+      }
+      break;
+
+    default:
+      break;
+
+  }
+}
 
 VALUE method_grab_keyboard(VALUE self, VALUE n_ed){
 
@@ -73,68 +120,47 @@ VALUE method_grab_keyboard(VALUE self, VALUE n_ed){
   int event_keycode;
   int event_type;
 
+  int super_key = XKeysymToKeycode(display, super_keysym);
+  unsigned int modifiers = 0; // ControlMask | ShiftMask;
 
   // updating the event_dispatcher value
   event_dispatcher = n_ed;
 
-  unsigned int modifiers = 0; // ControlMask | ShiftMask;
-
-  int super_key= XKeysymToKeycode(display, super_keysym);
-  int quit_key= XKeysymToKeycode(display, quit_keysym);
-
   XGrabKey(display, super_key, modifiers, window, False, GrabModeAsync, GrabModeAsync);
-
   XSelectInput(display, window, KeyPressMask | KeyReleaseMask);
 
-  should_release_keyboard = False ;
-  while (should_release_keyboard == False ) {
+  for (should_release_keyboard = False; should_release_keyboard == False; ) {
 
-    if (test_queued == True){
-      // just testing
+    if (test_queued == True || XPending(display) > 0){
+      // there is an event to process
+      if (test_queued == True){
+        // just testing
+        event_keycode = XKeysymToKeycode(display, XStringToKeysym(STR2CSTR(test_key)));
+        event_type = NUM2INT(test_event_type);
 
-      event_keycode = XKeysymToKeycode(display, XStringToKeysym(STR2CSTR(test_key)));
-      event_type = NUM2INT(test_event_type);
+        // doing only one keypress and quitting
+        should_release_keyboard = True ;
 
-      // doing only one keypress and quitting
-      should_release_keyboard = True ;
-
-      // marking the test as done
-      test_queued = False;
+        // marking the test as done
+        test_queued = False;
+      } else if (XPending(display)>0) {
+        // it's the reall stuff, query the xlib
+        XEvent event;
+        XNextEvent(display, &event);
+        event_keycode = event.xkey.keycode;
+        event_type = event.type;
+      }
+      process_key_event(event_keycode, event_type);
     } else {
-      // it's the reall stuff, query the xlib
-
-      XEvent event;
-      XNextEvent(display, &event);
-      event_keycode = event.xkey.keycode;
-      event_type = event.type;
-    }
-    char * key = XKeysymToString( XKeycodeToKeysym(display, event_keycode, 0));
-    switch(event_type) {
-
-      case KeyPress:
-        if (event_keycode == super_key){
-          XGrabKeyboard(display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime);
-        } else {
-          // send key_press to the event_dispatcher
-          rb_funcall(event_dispatcher, rb_intern("key_press"), 1, rb_str_new2(key));
+      if (test_wait_queued > 0){
+        // oh, we're testing idleness
+        if(--test_wait_queued==0){
+          // for a fixed amount of ticks
+          should_release_keyboard = True;
         }
-        break;
-
-      case KeyRelease:
-        if (event_keycode == super_key){
-          XUngrabKeyboard(display, CurrentTime);
-        } else if (event_keycode == quit_key ){
-          // the quit key has been released, exiting the loop
-          should_release_keyboard = True ;
-        } else {
-          // send key_release to the event_dispatcher
-          rb_funcall(event_dispatcher, rb_intern("key_release"), 1, rb_str_new2(key));
-        }
-        break;
-
-      default:
-        break;
-
+      }
+      // nothing happened
+      rb_funcall(event_dispatcher, rb_intern("wait"), 0);
     }
   }
   XUngrabKey(display,super_key,modifiers,window);
