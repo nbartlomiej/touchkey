@@ -15,29 +15,29 @@ describe CKey do
   describe "delegates events" do
 
     before do
-      @e = EventDispatcher.new
+      @dispatcher = EventDispatchers::SimpleDispatcher.new
     end
 
     it "delegates single-key events" do
-      @e.should_receive(:key_press).with('a').once
-      @e.should_receive(:key_release).with('a').once
-      CKey.test(@e).puts('a')
+      @dispatcher.should_receive(:key_press).with('a').once
+      @dispatcher.should_receive(:key_release).with('a').once
+      CKey.test(@dispatcher).puts('a')
     end
 
     it "delegates all events" do
-      @e.should_receive(:key_press).with('a').exactly(3).times
-      @e.should_receive(:key_release).with('a').exactly(3).times
-      @e.should_receive(:key_press).with('b').once
-      @e.should_receive(:key_release).with('b').once
-      CKey.test(@e).puts('a')
-      CKey.test(@e).puts('a')
-      CKey.test(@e).puts('b')
-      CKey.test(@e).puts('a')
+      @dispatcher.should_receive(:key_press).with('a').exactly(3).times
+      @dispatcher.should_receive(:key_release).with('a').exactly(3).times
+      @dispatcher.should_receive(:key_press).with('b').once
+      @dispatcher.should_receive(:key_release).with('b').once
+      CKey.test(@dispatcher).puts('a')
+      CKey.test(@dispatcher).puts('a')
+      CKey.test(@dispatcher).puts('b')
+      CKey.test(@dispatcher).puts('a')
     end
 
     it "informs about user's idleness" do
-      @e.should_receive(:wait).with().twice
-      CKey.test(@e).wait(2)
+      @dispatcher.should_receive(:wait).with().twice
+      CKey.test(@dispatcher).wait(2)
     end
 
   end
