@@ -11,5 +11,9 @@ module EventDispatchers
     def wait
       raise NotImplementedError
     end
+
+    def signal type, code=nil
+      send(type, code)
+    end
   end
 end

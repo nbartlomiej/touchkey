@@ -89,7 +89,7 @@ void process_key_event(int keycode , int type){
         XGrabKeyboard(display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime);
       } else {
         // send key_press to the event_dispatcher
-        rb_funcall(event_dispatcher, rb_intern("key_press"), 1, rb_str_new2(key));
+        rb_funcall(event_dispatcher, rb_intern("signal"), 2, rb_str_new2("key_press"), rb_str_new2(key));
       }
       break;
 
@@ -101,7 +101,7 @@ void process_key_event(int keycode , int type){
         should_release_keyboard = True ;
       } else {
         // send key_release to the event_dispatcher
-        rb_funcall(event_dispatcher, rb_intern("key_release"), 1, rb_str_new2(key));
+        rb_funcall(event_dispatcher, rb_intern("signal"), 2, rb_str_new2("key_release"), rb_str_new2(key));
       }
       break;
 
@@ -160,7 +160,7 @@ VALUE method_grab_keyboard(VALUE self, VALUE n_ed){
         }
       }
       // nothing happened
-      rb_funcall(event_dispatcher, rb_intern("wait"), 0);
+      rb_funcall(event_dispatcher, rb_intern("signal"), 1, rb_str_new2("wait"));
     }
   }
   XUngrabKey(display,super_key,modifiers,window);
