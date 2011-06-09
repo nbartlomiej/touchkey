@@ -17,8 +17,8 @@ module EventDispatchers
     #   signal('key_press', 'a')
     #   signal('key_release', 'b')
     #   signal('idle')
-    def signal type, *args
-      send(type, *args)
+    def signal code, *args
+      send(code, *args)
     end
 
   end
