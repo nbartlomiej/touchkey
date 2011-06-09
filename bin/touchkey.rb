@@ -2,7 +2,7 @@
 # fashion as $PATH
 $LOAD_PATH << "#{File.dirname(__FILE__)}/../lib"
 
-require 'event_dispatchers/simple_dispatcher'
+require 'event_dispatchers/magnetic'
 require 'CKey/CKey'
 
-CKey.grab_keyboard(EventDispatchers::SimpleDispatcher.new)
+CKey.grab_keyboard(EventDispatchers::Magnetic.new)
