@@ -8,12 +8,18 @@ module EventDispatchers
       raise NotImplementedError
     end
 
-    def wait
+    def idle
       raise NotImplementedError
     end
 
-    def signal type, code=nil
-      send(type, code)
+    # received from CKey when an event occurrs;
+    # sample calls:
+    #   signal('key_press', 'a')
+    #   signal('key_release', 'b')
+    #   signal('idle')
+    def signal type, *args
+      send(type, *args)
     end
+
   end
 end

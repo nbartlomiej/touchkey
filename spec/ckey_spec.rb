@@ -36,8 +36,8 @@ describe CKey do
     end
 
     it "informs about user's idleness" do
-      @dispatcher.should_receive(:signal).with('wait').twice
-      CKey.test(@dispatcher).wait(2)
+      @dispatcher.should_receive(:signal).with('idle').twice
+      CKey.test(@dispatcher).idle(2)
     end
 
   end

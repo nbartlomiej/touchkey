@@ -10,7 +10,7 @@ void Init_CKey();
 
 VALUE method_grab_keyboard(VALUE self, VALUE event_dispatcher);
 VALUE method_push_test(VALUE self, VALUE key, VALUE event_type);
-VALUE method_push_test_wait(VALUE self, VALUE ticks);
+VALUE method_push_test_idle(VALUE self, VALUE ticks);
 
 void grab_keyboard(void *args);
 
@@ -18,7 +18,7 @@ void Init_CKey() {
   CKey = rb_define_module("CKey");
   rb_define_singleton_method(CKey, "grab_keyboard", method_grab_keyboard, 1);
   rb_define_singleton_method(CKey, "push_test", method_push_test, 2);
-  rb_define_singleton_method(CKey, "push_test_wait", method_push_test_wait, 1);
+  rb_define_singleton_method(CKey, "push_test_idle", method_push_test_idle, 1);
   initialize_screen();
 }
 
@@ -69,12 +69,12 @@ VALUE method_push_test(VALUE self, VALUE key, VALUE event_type){
   test_event_type = event_type;
 }
 
-// test wait triggered for n ticks of time
-int test_wait_queued = 0;
+// test idle triggered for n ticks of time
+int test_idle_queued = 0;
 
-// receiving test wait from outer (ruby) libraries
-VALUE method_push_test_wait(VALUE self, VALUE ticks){
-  test_wait_queued = NUM2INT(ticks);
+// receiving test idle from outer (ruby) libraries
+VALUE method_push_test_idle(VALUE self, VALUE ticks){
+  test_idle_queued = NUM2INT(ticks);
 }
 
 void process_key_event(int keycode , int type){
@@ -152,15 +152,15 @@ VALUE method_grab_keyboard(VALUE self, VALUE n_ed){
       }
       process_key_event(event_keycode, event_type);
     } else {
-      if (test_wait_queued > 0){
+      if (test_idle_queued > 0){
         // oh, we're testing idleness
-        if(--test_wait_queued==0){
+        if(--test_idle_queued==0){
           // for a fixed amount of ticks
           should_release_keyboard = True;
         }
       }
       // nothing happened
-      rb_funcall(event_dispatcher, rb_intern("signal"), 1, rb_str_new2("wait"));
+      rb_funcall(event_dispatcher, rb_intern("signal"), 1, rb_str_new2("idle"));
     }
   }
   XUngrabKey(display,super_key,modifiers,window);

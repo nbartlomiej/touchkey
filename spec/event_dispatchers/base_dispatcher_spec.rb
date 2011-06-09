@@ -8,6 +8,16 @@ describe EventDispatchers::BaseDispatcher do
       subject.should_receive(:key_press).with('a').once
       subject.signal('key_press', 'a')
     end
+    it "processes key_release" do
+      subject.stub(:key_press).with('a')
+      subject.should_receive(:key_press).with('a').once
+      subject.signal('key_press', 'a')
+    end
+    it "processes idle" do
+      subject.stub(:idle).with()
+      subject.should_receive(:idle).with().once
+      subject.signal('idle')
+    end
     it "sends complete signal sequences" do
       subject.stub(:key_press).with('a')
       subject.stub(:key_press).with('b')
@@ -28,8 +38,8 @@ describe EventDispatchers::BaseDispatcher do
       expect { subject.key_release('a') }.to raise_error(NotImplementedError)
     end
 
-    it "raises error when wait is invoked" do
-      expect { subject.wait() }.to raise_error(NotImplementedError)
+    it "raises error when idle is invoked" do
+      expect { subject.idle() }.to raise_error(NotImplementedError)
     end
   end
 end

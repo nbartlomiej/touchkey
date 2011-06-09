@@ -22,7 +22,7 @@ module EventDispatchers
     def key_release(key)
     end
 
-    def wait
+    def idle
       sleep(0.01)
     end
 

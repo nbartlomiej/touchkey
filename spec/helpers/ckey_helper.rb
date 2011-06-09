@@ -21,8 +21,8 @@ module CKey
     self.grab_keyboard(@@target_dispatcher)
   end
 
-  def self.wait(ticks)
-    self.push_test_wait(ticks)
+  def self.idle(ticks)
+    self.push_test_idle(ticks)
     self.grab_keyboard(@@target_dispatcher)
   end
 

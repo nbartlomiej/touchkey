@@ -13,7 +13,7 @@ module EventDispatchers
       raise NotImplementedError
     end
 
-    def wait
+    def idle
       raise NotImplementedError
     end
   end
