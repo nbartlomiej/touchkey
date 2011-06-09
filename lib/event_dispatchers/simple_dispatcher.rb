@@ -3,7 +3,6 @@ $LOAD_PATH << "#{File.dirname(__FILE__)}/../lib"
 module EventDispatchers
 
   require 'CMouse/CMouse'
-
   require 'event_dispatchers/base_dispatcher'
 
   class SimpleDispatcher < BaseDispatcher
