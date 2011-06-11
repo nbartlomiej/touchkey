@@ -20,7 +20,11 @@ module EventDispatchers
     end
 
     def key_release(key)
-      @target_x, @target_y = CMouse.get_mouse_x, CMouse.get_mouse_y
+      if key == 'space'
+        CMouse.left_click
+      else
+        @target_x, @target_y = CMouse.get_mouse_x, CMouse.get_mouse_y
+      end
     end
 
     def idle

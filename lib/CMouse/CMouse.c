@@ -12,6 +12,7 @@ VALUE method_get_mouse_x(VALUE self);
 VALUE method_get_mouse_y(VALUE self);
 VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y);
 VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y);
+VALUE method_left_click(VALUE self);
 
 // The initialization method for this module
 void Init_CMouse() {
@@ -20,6 +21,7 @@ void Init_CMouse() {
   rb_define_singleton_method(CMouse, "get_mouse_y", method_get_mouse_y, 0);
   rb_define_singleton_method(CMouse, "set_mouse_rel", method_set_mouse_rel, 2);
   rb_define_singleton_method(CMouse, "set_mouse_abs", method_set_mouse_abs, 2);
+  rb_define_singleton_method(CMouse, "left_click", method_left_click, 0);
   initialize_screen();
 }
 
@@ -66,6 +68,14 @@ VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y){
 VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y){
   // XWarpPointer(display, None, None, 0, 0, 0, 0, NUM2INT(x), NUM2INT(y));
   XTestFakeMotionEvent(display, screen, NUM2INT(x), NUM2INT(y), 0);
+  XSync(display, 1);
+}
+
+/* Send Fake Key Event */  
+VALUE method_left_click(VALUE self){
+  XTestFakeButtonEvent (display, 1, True,  0);
+  XSync(display, 1);
+  XTestFakeButtonEvent (display, 1, False,  0);
   XSync(display, 1);
 }
 
