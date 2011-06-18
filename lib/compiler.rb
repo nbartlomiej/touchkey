@@ -1,5 +1,5 @@
 class Compiler
-  MODULE_NAMES = ['CMouse']
+  MODULE_NAMES = ['CMouse', 'CKey']
 
   # makes all modules, returns false if any of them
   # fail, true otherwise

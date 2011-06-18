@@ -12,14 +12,16 @@ VALUE method_get_mouse_x(VALUE self);
 VALUE method_get_mouse_y(VALUE self);
 VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y);
 VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y);
+VALUE method_left_click(VALUE self);
 
 // The initialization method for this module
 void Init_CMouse() {
   CMouse = rb_define_module("CMouse");
-  rb_define_method(CMouse, "get_mouse_x", method_get_mouse_x, 0);
-  rb_define_method(CMouse, "get_mouse_y", method_get_mouse_y, 0);
-  rb_define_method(CMouse, "set_mouse_rel", method_set_mouse_rel, 2);
-  rb_define_method(CMouse, "set_mouse_abs", method_set_mouse_abs, 2);
+  rb_define_singleton_method(CMouse, "get_mouse_x", method_get_mouse_x, 0);
+  rb_define_singleton_method(CMouse, "get_mouse_y", method_get_mouse_y, 0);
+  rb_define_singleton_method(CMouse, "set_mouse_rel", method_set_mouse_rel, 2);
+  rb_define_singleton_method(CMouse, "set_mouse_abs", method_set_mouse_abs, 2);
+  rb_define_singleton_method(CMouse, "left_click", method_left_click, 0);
   initialize_screen();
 }
 
@@ -47,13 +49,15 @@ int initialize_screen() {
 }
 
 VALUE method_get_mouse_x(VALUE self) {
-  int x = 10;
-  return INT2NUM(x);
+  XEvent event;
+  XQueryPointer(display, RootWindow(display, DefaultScreen(display)), &event.xbutton.root, &event.xbutton.window, &event.xbutton.x_root, &event.xbutton.y_root, &event.xbutton.x, &event.xbutton.y, &event.xbutton.state);
+  return INT2NUM(event.xbutton.x_root);
 }
 
 VALUE method_get_mouse_y(VALUE self) {
-  int x = 10;
-  return INT2NUM(x);
+  XEvent event;
+  XQueryPointer(display, RootWindow(display, DefaultScreen(display)), &event.xbutton.root, &event.xbutton.window, &event.xbutton.x_root, &event.xbutton.y_root, &event.xbutton.x, &event.xbutton.y, &event.xbutton.state);
+  return INT2NUM(event.xbutton.y_root);
 }
 
 VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y){
@@ -62,7 +66,16 @@ VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y){
 }
 
 VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y){
+  // XWarpPointer(display, None, None, 0, 0, 0, 0, NUM2INT(x), NUM2INT(y));
   XTestFakeMotionEvent(display, screen, NUM2INT(x), NUM2INT(y), 0);
+  XSync(display, 1);
+}
+
+/* Send Fake Key Event */  
+VALUE method_left_click(VALUE self){
+  XTestFakeButtonEvent (display, 1, True,  0);
+  XSync(display, 1);
+  XTestFakeButtonEvent (display, 1, False,  0);
   XSync(display, 1);
 }
 

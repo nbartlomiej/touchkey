@@ -2,8 +2,7 @@
 # fashion as $PATH
 $LOAD_PATH << "#{File.dirname(__FILE__)}/../lib"
 
-require 'CMouse/CMouse'
-include CMouse
+require 'event_dispatchers/magnetic'
+require 'CKey/CKey'
 
-puts set_mouse_abs(100, 200)
-puts set_mouse_rel(100, 200)
+CKey.grab_keyboard(EventDispatchers::Magnetic.new)
