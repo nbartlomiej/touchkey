@@ -3,10 +3,11 @@
 #include <X11/extensions/XTest.h>
 
 // Defining a space for information and references about the module to be stored internally
-VALUE CMouse = Qnil;
+VALUE Touchkey = Qnil;
+VALUE Mouse = Qnil;
 
 // Prototype for the initialization method
-void Init_CMouse();
+void Init_Mouse();
 
 VALUE method_get_mouse_x(VALUE self);
 VALUE method_get_mouse_y(VALUE self);
@@ -15,13 +16,14 @@ VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y);
 VALUE method_left_click(VALUE self);
 
 // The initialization method for this module
-void Init_CMouse() {
-  CMouse = rb_define_module("CMouse");
-  rb_define_singleton_method(CMouse, "get_mouse_x", method_get_mouse_x, 0);
-  rb_define_singleton_method(CMouse, "get_mouse_y", method_get_mouse_y, 0);
-  rb_define_singleton_method(CMouse, "set_mouse_rel", method_set_mouse_rel, 2);
-  rb_define_singleton_method(CMouse, "set_mouse_abs", method_set_mouse_abs, 2);
-  rb_define_singleton_method(CMouse, "left_click", method_left_click, 0);
+void Init_Mouse() {
+  Touchkey = rb_define_module("Touchkey");
+  Mouse = rb_define_module_under(Touchkey, "Mouse");
+  rb_define_singleton_method(Mouse, "get_mouse_x", method_get_mouse_x, 0);
+  rb_define_singleton_method(Mouse, "get_mouse_y", method_get_mouse_y, 0);
+  rb_define_singleton_method(Mouse, "set_mouse_rel", method_set_mouse_rel, 2);
+  rb_define_singleton_method(Mouse, "set_mouse_abs", method_set_mouse_abs, 2);
+  rb_define_singleton_method(Mouse, "left_click", method_left_click, 0);
   initialize_screen();
 }
 

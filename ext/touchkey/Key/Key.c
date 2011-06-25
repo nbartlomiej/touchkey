@@ -3,10 +3,11 @@
 #include <X11/Xutil.h>
 
 // Defining a space for information and references about the module to be stored internally
-VALUE CKey = Qnil;
+VALUE Touchkey = Qnil;
+VALUE Key = Qnil;
 
 // Prototype for the initialization method
-void Init_CKey();
+void Init_Key();
 
 VALUE method_grab_keyboard(VALUE self, VALUE event_dispatcher);
 VALUE method_push_test(VALUE self, VALUE key, VALUE event_type);
@@ -14,11 +15,12 @@ VALUE method_push_test_idle(VALUE self, VALUE ticks);
 
 void grab_keyboard(void *args);
 
-void Init_CKey() {
-  CKey = rb_define_module("CKey");
-  rb_define_singleton_method(CKey, "grab_keyboard", method_grab_keyboard, 1);
-  rb_define_singleton_method(CKey, "push_test", method_push_test, 2);
-  rb_define_singleton_method(CKey, "push_test_idle", method_push_test_idle, 1);
+void Init_Key() {
+  Touchkey = rb_define_module("Touchkey");
+  Key = rb_define_module_under(Touchkey, "Key");
+  rb_define_singleton_method(Key, "grab_keyboard", method_grab_keyboard, 1);
+  rb_define_singleton_method(Key, "push_test", method_push_test, 2);
+  rb_define_singleton_method(Key, "push_test_idle", method_push_test_idle, 1);
   initialize_screen();
 }
 

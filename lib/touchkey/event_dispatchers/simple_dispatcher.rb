@@ -1,7 +1,7 @@
 module Touchkey
   module EventDispatchers
 
-    require 'CMouse/CMouse'
+    require 'touchkey/Mouse/Mouse'
     require 'touchkey/event_dispatchers/base_dispatcher'
 
     class SimpleDispatcher < BaseDispatcher
@@ -12,7 +12,7 @@ module Touchkey
               x_ratio, y_ratio = @width / (line.length-1), @height / (@keys.length-1)
               x = local_x * x_ratio
               y = local_y * y_ratio
-              CMouse.set_mouse_abs(x, y)
+              Touchkey::Mouse.set_mouse_abs(x, y)
             end
           end
         end
@@ -27,12 +27,13 @@ module Touchkey
 
       def initialize
         @keys = ['1234567890', 'qwertyuiop', 'asdfghjkl;', 'zxcvbnm,./']
-        @width, @height = `xrandr`.scan(/current (\d+) x (\d+)/).flatten.map do |str|
-          str.to_i
-        end
+        # @width, @height = `xrandr`.scan(/current (\d+) x (\d+)/).flatten.map do |str|
+        #   str.to_i
+        # end
+        @width = 700
+        @height = 300
       end
 
     end
-
   end
 end
