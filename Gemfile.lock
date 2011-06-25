@@ -4,6 +4,7 @@ GEM
     columnize (0.3.3)
     diff-lcs (1.1.2)
     linecache (0.45)
+    rbx-require-relative (0.0.5)
     rspec (2.6.0)
       rspec-core (~> 2.6.0)
       rspec-expectations (~> 2.6.0)
@@ -22,5 +23,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  rbx-require-relative (= 0.0.5)
   rspec (= 2.6.0)
   ruby-debug (= 0.10.4)
