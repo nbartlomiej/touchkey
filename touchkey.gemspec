@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{Touchscreen-style mouse control through keybaord}
   s.description = %q{Touchkey is an attempt to turn keyboard into a touchscreen-like input device. It allows to control the mouse pointer in a quick and precise way, without moving your hands off the keyboard.}
 
-  s.extensions = ["ext/touchkey/Key/extconf.rb", "ext/touchkey/Mouse/extconf.rb"]
+  s.extensions = ["ext/touchkey/linux/Key/extconf.rb", "ext/touchkey/linux/Mouse/extconf.rb"]
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
