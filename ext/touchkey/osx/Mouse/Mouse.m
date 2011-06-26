@@ -14,7 +14,6 @@ void Init_Mouse();
 
 VALUE method_get_mouse_x(VALUE self);
 VALUE method_get_mouse_y(VALUE self);
-VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y);
 VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y);
 VALUE method_left_click(VALUE self);
 
@@ -24,39 +23,32 @@ void Init_Mouse() {
   Mouse = rb_define_module_under(Touchkey, "Mouse");
   rb_define_singleton_method(Mouse, "get_mouse_x", method_get_mouse_x, 0);
   rb_define_singleton_method(Mouse, "get_mouse_y", method_get_mouse_y, 0);
-  rb_define_singleton_method(Mouse, "set_mouse_rel", method_set_mouse_rel, 2);
   rb_define_singleton_method(Mouse, "set_mouse_abs", method_set_mouse_abs, 2);
   rb_define_singleton_method(Mouse, "left_click", method_left_click, 0);
   initialize_screen();
 }
 
 
+// NSEvent returns y coordinates relatively to the BOTTOM
+// edge of the screen (and not to the top edge); height_offset
+// variable helps in doing the conversion.
+int height_offset;
+
 int initialize_screen() {
-  // NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  // NSUserDefaults *args = [NSUserDefaults standardUserDefaults];
+  CGDirectDisplayID display = CGMainDisplayID();
+  height_offset = CGDisplayPixelsHigh (display);
 }
 
 VALUE method_get_mouse_x(VALUE self) {
   NSPoint mouseLoc;
   mouseLoc = [NSEvent mouseLocation];
   return INT2NUM(mouseLoc.x);
-//   XEvent event;
-//   XQueryPointer(display, RootWindow(display, DefaultScreen(display)), &event.xbutton.root, &event.xbutton.window, &event.xbutton.x_root, &event.xbutton.y_root, &event.xbutton.x, &event.xbutton.y, &event.xbutton.state);
-//   return INT2NUM(event.xbutton.x_root);
 }
 
 VALUE method_get_mouse_y(VALUE self) {
   NSPoint mouseLoc;
   mouseLoc = [NSEvent mouseLocation];
-  return INT2NUM(mouseLoc.y);
-//   XEvent event;
-//   XQueryPointer(display, RootWindow(display, DefaultScreen(display)), &event.xbutton.root, &event.xbutton.window, &event.xbutton.x_root, &event.xbutton.y_root, &event.xbutton.x, &event.xbutton.y, &event.xbutton.state);
-//   return INT2NUM(event.xbutton.y_root);
-}
-
-VALUE method_set_mouse_rel(VALUE self, VALUE x, VALUE y){
-//   XTestFakeRelativeMotionEvent(display, NUM2INT(x), NUM2INT(y), 0);
-//   XSync(display, 1);
+  return INT2NUM(height_offset - mouseLoc.y);
 }
 
 VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y){
@@ -77,9 +69,14 @@ VALUE method_set_mouse_abs(VALUE self, VALUE x, VALUE y){
 
 /* Send Fake Key Event */  
 VALUE method_left_click(VALUE self){
-//   XTestFakeButtonEvent (display, 1, True,  0);
-//   XSync(display, 1);
-//   XTestFakeButtonEvent (display, 1, False,  0);
-//   XSync(display, 1);
+  NSPoint mouseLoc;
+  mouseLoc = [NSEvent mouseLocation];
+  int y = (height_offset - mouseLoc.y);
+  int x = mouseLoc.x;
+  CGPoint pt;
+  pt.x = x;
+  pt.y = y;
+  CGPostMouseEvent( pt, 1, 1, 1 );
+  CGPostMouseEvent( pt, 1, 1, 0 );
 }
 
