@@ -1,6 +1,8 @@
 require 'spec_helper'
 
-require 'CKey/CKey'
+require 'touchkey/event_dispatchers/simple_dispatcher'
+require 'touchkey/portable'
+Touchkey::Portable::require_native 'touchkey/Key/Key'
 
 require 'helpers/ckey_helper'
 
@@ -15,7 +17,11 @@ describe CKey do
   describe "delegates events" do
 
     before do
-      @dispatcher = EventDispatchers::SimpleDispatcher.new
+      @dispatcher = Touchkey::EventDispatchers::SimpleDispatcher.new
+    end
+
+    it "is a test test" do
+      Touchkey::Key.grab_keyboard(nil)
     end
 
     it "delegates single-key events" do

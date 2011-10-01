@@ -1,7 +1,8 @@
 module Touchkey
   module EventDispatchers
 
-    require 'touchkey/Mouse/Mouse'
+    require 'touchkey/portable'
+    Touchkey::Portable::require_native 'touchkey/Mouse/Mouse'
     require 'touchkey/event_dispatchers/base_dispatcher'
 
     class SimpleDispatcher < BaseDispatcher

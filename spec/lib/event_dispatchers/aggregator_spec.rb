@@ -1,7 +1,6 @@
 require 'spec_helper'
-require 'event_dispatchers/aggregator'
 
-describe EventDispatchers::Aggregator do
+describe Touchkey::EventDispatchers::Aggregator do
 
   before do
     @dispatcher = EventDispatchers::Aggregator.new

@@ -1,4 +1,5 @@
-require 'touchkey/event_dispatchers/simple_dispatcher'
+require 'spec_helper'
+
 describe Touchkey::EventDispatchers::SimpleDispatcher do
   describe "captures letters and sets mouse accordingly" do
     it "puts mouse in the top left corner" do

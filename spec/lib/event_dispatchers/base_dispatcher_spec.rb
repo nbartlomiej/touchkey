@@ -1,7 +1,6 @@
 require 'spec_helper'
-require 'event_dispatchers/base_dispatcher'
 
-describe EventDispatchers::BaseDispatcher do
+describe Touchkey::EventDispatchers::BaseDispatcher do
   describe "translates signals directly to method calls" do
     it "processes key_press" do
       subject.stub(:key_press).with('a')
