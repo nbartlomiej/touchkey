@@ -3,11 +3,8 @@ class EventDispatcher
 end
 
 # enhancements to CKey for manual event sending
-module CKey
+module Touchkey::Key
 
-  # Xlib's values of event types
-  KEY_PRESS = 2
-  KEY_RELEASE = 3
 
   def self.test(event_dispatcher)
     @@target_dispatcher = event_dispatcher
@@ -15,9 +12,9 @@ module CKey
   end
 
   def self.puts(key)
-    self.push_test(key, KEY_PRESS)
+    self.push_test(key, Touchkey::Portable.key_press)
     self.grab_keyboard(@@target_dispatcher)
-    self.push_test(key, KEY_RELEASE)
+    self.push_test(key, Touchkey::Portable.key_release)
     self.grab_keyboard(@@target_dispatcher)
   end
 
