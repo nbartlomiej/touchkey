@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
 require "touchkey/version"
+require "touchkey/portable"
 
 Gem::Specification.new do |s|
   s.name        = "touchkey"
@@ -11,8 +12,10 @@ Gem::Specification.new do |s|
   s.summary     = %q{Touchscreen-style mouse control through keybaord}
   s.description = %q{Touchkey is an attempt to turn keyboard into a touchscreen-like input device. It allows to control the mouse pointer in a quick and precise way, without moving your hands off the keyboard.}
 
-  # TODO: insert system-dependant paths here
-  s.extensions = ["ext/touchkey/linux/Key/extconf.rb", "ext/touchkey/linux/Mouse/extconf.rb"]
+  s.extensions = [
+    "ext/touchkey/#{Touchkey::Portable::platform}/Key/extconf.rb",
+    "ext/touchkey/#{Touchkey::Portable::platform}/Mouse/extconf.rb"
+  ]
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
