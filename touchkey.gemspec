@@ -22,8 +22,8 @@ Gem::Specification.new do |s|
   s.required_ruby_version     = '~> 1.8.7'
   s.required_rubygems_version = ">= 1.3.6"
 
-  s.add_dependency('bundler', '~> 1.0')
-  s.add_dependency('rspec', '~> 2.6.0')
-  s.add_dependency('ruby-debug', '>= 0.10.4')
-  s.add_dependency('rbx-require-relative', '>= 0.0.5')
+  s.add_dependency('bundler'              , '~> 1.0')
+  s.add_dependency('rspec'                , '~> 2.6.0')
+  s.add_dependency('ruby-debug'           , '>= 0.10.4')
+  s.add_dependency('rbx-require-relative' , '>= 0.0.5')
 end
