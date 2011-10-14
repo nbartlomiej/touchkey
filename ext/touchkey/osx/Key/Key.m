@@ -27,15 +27,6 @@ void Init_Key() {
   initialize_screen();
 }
 
-// TODO: Display *display; // X display
-// TODO: int screen;       // screen number
-// TODO: Window window;    // X window
-
-// the 'super' key, toggles keyboard grab by touchkey
-// int super_keysym = // TODO: XK_Super_L;
-
-// int quit_keysym = // TODO: XK_L;
-
 // global bool variable indicating whether the
 // keyboard-grabbing event loop should hit break
 int should_release_keyboard = false ;
@@ -53,22 +44,6 @@ int initialize_screen() {
 
   CGDirectDisplayID display = CGMainDisplayID();
   height_offset = CGDisplayPixelsHigh (display);
-
-  /*
-  Window ret_window;
-  int x, y;
-  unsigned int border_width, depth;
-
-  if (! (display = // TODO: XOpenDisplay("")) ) {
-    fprintf(stderr, "TouchKey: Cannot connect to display ...\n");
-    return 1;
-  }
-
-  screen = // TODO: DefaultScreen(display);
-  window = // TODO: RootWindow(display, screen);
-  unsigned int width, height; // placeholders, thrown away asap
-  // TODO: XGetGeometry( display, window, &ret_window, &x, &y, &width, &height, &border_width, &depth);
-  */
 }
 
 // is test key event triggered?
@@ -93,7 +68,10 @@ VALUE method_push_test_idle(VALUE self, VALUE ticks){
   test_idle_queued = NUM2INT(ticks);
 }
 
-// Used under MIT license from http://inquisitivecocoa.com/2009/04/05/key-code-translator/
+// Used under MIT license from
+// http://inquisitivecocoa.com/2009/04/05/key-code-translator/
+// Not working though, TODO: investigate. There's a temporary set of bruteforce
+// functions, that should be deleted as soon as the proper solution is fixed.
 static const struct { char const* const name; unichar const glyph; } mapOfNamesForUnicodeGlyphs[] =
 {
   // Constants defined in NSEvent.h that are expected to relate to unicode characters, but don't seen to translate properly
@@ -160,7 +138,6 @@ NSString * convertKeycodeToKeysym(unsigned short keyCode, NSUInteger modifierFla
         i++;
       }
 
-      // NSLog(@"Unicode character as hexadecimal: %X", unicodeString[0]);
       return [NSString stringWithCharacters:unicodeString length:(NSInteger)actualStringLength];
     } else
       NSLog(@"Couldn't find a translation for the '%d' key code", keyCode);
@@ -170,7 +147,7 @@ NSString * convertKeycodeToKeysym(unsigned short keyCode, NSUInteger modifierFla
   return nil;
 }
 
-// don't look below :(
+// This is a temporary solution, TODO: refactor
 char * keycodeToString(int keycode){
   if (keycode == 1) return "a";
   else if (keycode == 2) return "b";
@@ -184,6 +161,7 @@ char * keycodeToString(int keycode){
   return "unknown";
 }
 
+// This is a temporary solution, TODO: refactor
 int charToKeycode(char * c){
   if (strcmp(c, "a")==0) return 1;
   if (strcmp(c, "b")==0) return 2;
@@ -196,39 +174,41 @@ bool hit = false;
 
 bool process_key_event(int keycode , int type){
   hit = true;
-  int quit_key = -998; // TODO: XKeysymToKeycode(display, quit_keysym);
-  int super_key = -999; // TODO: XKeysymToKeycode(display, super_keysym);
+  int quit_key = -998  ; // TODO: assign proper quit key
+  int super_key = -999 ; // TODO: assign proper super key (probably a modifier)
 
-  char * key = keycodeToString(keycode);//"z"; // TODO: XKeysymToString( XKeycodeToKeysym(display, keycode, 0));
-  // printf("characters: %s %s %s", key2, key3, key4);
+  char * key = keycodeToString(keycode);
   switch(type) {
 
-    case 10: // TODO: KeyPress:
+    case 10: // KeyPress; TODO: improve readability
       if (keycode == super_key){
         grabbing = true;
-        // TODO: XGrabKeyboard(display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime);
         return true;
       } else if (grabbing){
         // send key_press to the event_dispatcher
         rb_funcall(event_dispatcher, rb_intern("signal"), 2, rb_str_new2("key_press"), rb_str_new2(key));
         return true;
+      } else {
+        return false;
       }
       break;
 
-    case 11: // TODO: KeyRelease:
+    case 11: // KeyRelease; TODO: improve readability
       if (keycode == super_key){
-        // TODO: XUngrabKeyboard(display, CurrentTime);
         grabbing = false;
         return true;
       } else if (keycode == quit_key ){
         // the quit key has been released, exiting the loop
         should_release_keyboard = true ;
         return true;
-      } else {
+      } else if (grabbing == true){
         // send key_release to the event_dispatcher
         rb_funcall(event_dispatcher, rb_intern("signal"), 2, rb_str_new2("key_release"), rb_str_new2(key));
         return true;
+      } else {
+        return false;
       }
+
       break;
 
     default:
@@ -245,6 +225,8 @@ bool process_key_event(int keycode , int type){
   int event_keycode;
   int event_type;
 
+// Event callback with which the tap is performed.
+// Based on: http://osxbook.com/book/bonus/chapter2/alterkeys/
 CGEventRef myCGEventCallback(CGEventTapProxy proxy, CGEventType type,
     CGEventRef event, void *refcon) {
   // Paranoid sanity check.
@@ -255,26 +237,17 @@ CGEventRef myCGEventCallback(CGEventTapProxy proxy, CGEventType type,
   CGKeyCode keycode = (CGKeyCode)CGEventGetIntegerValueField(
       event, kCGKeyboardEventKeycode);
 
+  // Uncomment to debug.
+  // printf("Received keycode: %d.", keycode);
+  // fflush(0);
+
   event_keycode = (int)keycode;
   event_type = (int)type;
 
   if (process_key_event(keycode, type))
-    return;
+    return 0;
   else
     return event;
-
-  // // Swap 'a' (keycode=0) and 'z' (keycode=6).
-  // if (keycode == (CGKeyCode)0)
-  //   keycode = (CGKeyCode)6;
-  // else if (keycode == (CGKeyCode)6)
-  //   keycode = (CGKeyCode)0;
-
-  // // Set the modified keycode field in the event.
-  // CGEventSetIntegerValueField(
-  //     event, kCGKeyboardEventKeycode, (int64_t)keycode);
-
-  // We must return the event for it to be useful.
-  // return event;
 }
 
 
@@ -326,12 +299,6 @@ VALUE method_grab_keyboard(VALUE self, VALUE new_event_dispatcher){
 
         process_key_event(event_keycode, event_type);
       } else {
-        // if (false){// TODO: XPending(display)>0) {
-        // it's the reall stuff, query the xlib
-        // TODO: XEvent event;
-        // TODO: XNextEvent(display, &event);
-        // event_keycode = event.xkey.keycode;
-        // event_type = event.type;
 
         // Set it all running.
         int returnValue = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.01, false);
@@ -349,7 +316,5 @@ VALUE method_grab_keyboard(VALUE self, VALUE new_event_dispatcher){
       rb_funcall(event_dispatcher, rb_intern("signal"), 1, rb_str_new2("idle"));
     }
   }
-  // TODO: XUngrabKey(display,super_key,modifiers,window);
-
 
 }
