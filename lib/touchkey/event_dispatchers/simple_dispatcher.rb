@@ -1,10 +1,6 @@
 module Touchkey
   module EventDispatchers
 
-    require 'touchkey/portable'
-    Touchkey::Portable::require_native 'touchkey/Mouse/Mouse'
-    require 'touchkey/event_dispatchers/base_dispatcher'
-
     class SimpleDispatcher < BaseDispatcher
       def key_press(key)
         @keys.each_with_index do |line, local_y|

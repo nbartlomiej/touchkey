@@ -1,8 +1,6 @@
 module Touchkey
   module EventDispatchers
 
-    # require 'event_dispatchers/base_dispatcher'
-
     class Aggregator < BaseDispatcher
       def key_press(key)
         raise NotImplementedError

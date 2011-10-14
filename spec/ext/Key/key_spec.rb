@@ -1,11 +1,5 @@
 require 'spec_helper'
 
-require 'touchkey/event_dispatchers/simple_dispatcher'
-require 'touchkey/portable'
-Touchkey::Portable::require_native 'touchkey/Key/Key'
-
-require 'helpers/key_helper'
-
 describe Touchkey::Key do
 
   it "invokes main api when using test methods" do

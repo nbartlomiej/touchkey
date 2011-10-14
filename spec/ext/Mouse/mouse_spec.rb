@@ -1,8 +1,5 @@
 require 'spec_helper'
 
-require 'touchkey/portable'
-Touchkey::Portable::require_native 'touchkey/Mouse/Mouse'
-
 describe Touchkey::Mouse do
 
   before(:all) do

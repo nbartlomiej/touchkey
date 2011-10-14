@@ -1,10 +1,6 @@
 module Touchkey
   module EventDispatchers
 
-    require 'CMouse/CMouse'
-    require 'event_dispatchers/aggregator'
-    require 'event_dispatchers/base_dispatcher'
-
     class Magnetic < BaseDispatcher
       def key_press(key)
         @keys.each_with_index do |line, local_y|

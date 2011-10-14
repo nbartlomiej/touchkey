@@ -1,4 +1,5 @@
-require 'touchkey/portable'
+require 'spec_helper'
+
 describe Touchkey::Portable do
   describe '.platform' do
     it "recognises osx system" do

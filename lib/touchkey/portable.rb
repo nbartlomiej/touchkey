@@ -12,7 +12,7 @@ module Touchkey
       end
     end
     def self.require_native path
-      require path.sub('touchkey/', "touchkey/#{platform}/")
+      require path.sub('touchkey/', "ext/touchkey/#{platform}/")
     end
     # Event types for keypress / keyrelease types for different os. TODO:
     # refactor.
