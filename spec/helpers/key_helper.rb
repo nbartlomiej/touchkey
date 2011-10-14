@@ -1,10 +1,5 @@
-# stub for the EventDispatcher class
-class EventDispatcher
-end
-
 # enhancements to CKey for manual event sending
 module Touchkey::Key
-
 
   def self.test(event_dispatcher)
     @@target_dispatcher = event_dispatcher
