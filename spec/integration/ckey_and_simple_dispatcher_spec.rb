@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe "CKey and SimpleDispatcher" do
+describe "Key and SimpleDispatcher" do
   it "alters mouse position" do
-    CMouse.should_receive(:set_mouse_abs)
-    CKey.test(EventDispatchers::SimpleDispatcher.new).puts('a')
+    Touchkey::Mouse.should_receive(:set_mouse_abs)
+    Touchkey::Key.test(Touchkey::EventDispatchers::SimpleDispatcher.new).puts('a')
   end
 end

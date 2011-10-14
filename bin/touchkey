@@ -4,7 +4,6 @@
 # fashion as $PATH
 $LOAD_PATH << "#{File.dirname(__FILE__)}/../lib"
 
-require 'event_dispatchers/magnetic'
-require 'CKey/CKey'
+require 'touchkey'
 
-CKey.grab_keyboard(EventDispatchers::Magnetic.new)
+Touchkey::Key.grab_keyboard(Touchkey::EventDispatchers::SimpleDispatcher.new)
