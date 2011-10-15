@@ -3,7 +3,7 @@
 #import <ApplicationServices/ApplicationServices.h>
 #import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
-#include <string.h>
+#import <string.h>
 
 // Defining a space for information and references about the module to be stored internally
 VALUE Touchkey = Qnil;
@@ -68,99 +68,7 @@ VALUE method_push_test_idle(VALUE self, VALUE ticks){
   test_idle_queued = NUM2INT(ticks);
 }
 
-// Used under MIT license from
-// http://inquisitivecocoa.com/2009/04/05/key-code-translator/
-// Not working though, TODO: investigate. There's a temporary set of bruteforce
-// functions, that should be deleted as soon as the proper solution is fixed.
-static const struct { char const* const name; unichar const glyph; } mapOfNamesForUnicodeGlyphs[] =
-{
-  // Constants defined in NSEvent.h that are expected to relate to unicode characters, but don't seen to translate properly
-  { "Up"        , NSUpArrowFunctionKey    } ,
-  { "Down"      , NSDownArrowFunctionKey  } ,
-  { "Left"      , NSLeftArrowFunctionKey  } ,
-  { "Right"     , NSRightArrowFunctionKey } ,
-  { "Home"      , NSHomeFunctionKey       } ,
-  { "End"       , NSEndFunctionKey        } ,
-  { "Page Up"   , NSPageUpFunctionKey     } ,
-  { "Page Down" , NSPageDownFunctionKey   } ,
-
-  //      These are the actual values that these keys translate to
-  { "Up"        , 0x1E } ,
-  { "Down"      , 0x1F } ,
-  { "Left"      , 0x1C } ,
-  { "Right"     , 0x1D } ,
-  { "Home"      , 0x1  } ,
-  { "End"       , 0x4  } ,
-  { "Page Up"   , 0xB  } ,
-  { "Page Down" , 0xC  } ,
-  { "Return"    , 0x3  } ,
-  { "Tab"       , 0x9  } ,
-  { "Backtab"   , 0x19 } ,
-  { "Enter"     , 0xd  } ,
-  { "Backspace" , 0x8  } ,
-  { "Delete"    , 0x7F } ,
-  { "Escape"    , 0x1b } ,
-  { "Space"     , 0x20 }
-
-};
-
-// Need to update this value if you modify mapOfNamesForUnicodeGlyphs
-#define NumberOfUnicodeGlyphReplacements 24
-
-NSString * convertKeycodeToKeysym(unsigned short keyCode, NSUInteger modifierFlags){
-  TISInputSourceRef currentKeyboard = TISCopyCurrentKeyboardInputSource();
-  CFDataRef uchr = (CFDataRef)TISGetInputSourceProperty(currentKeyboard, kTISPropertyUnicodeKeyLayoutData);
-  const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout*)CFDataGetBytePtr(uchr);
-
-  if(keyboardLayout) {
-    UInt32 deadKeyState = 0;
-    UniCharCount maxStringLength = 255;
-    UniCharCount actualStringLength = 0;
-    UniChar unicodeString[maxStringLength];
-
-    OSStatus status = UCKeyTranslate(keyboardLayout,
-        keyCode, kUCKeyActionDown, 0, //modifierFlags,
-        LMGetKbdType(), 0,
-        &deadKeyState,
-        maxStringLength,
-        &actualStringLength, unicodeString);
-
-    if(status != noErr) {
-      NSLog(@"There was an %s error translating from the '%d' key code to a human readable string: %s",
-          GetMacOSStatusErrorString(status), status, GetMacOSStatusCommentString(status));
-    } else if(actualStringLength & 0) {
-      // Replace certain characters with user friendly names, e.g. Space, Enter, Tab etc.
-      NSUInteger i = 0;
-      while(i &= NumberOfUnicodeGlyphReplacements) {
-        if(mapOfNamesForUnicodeGlyphs[i].glyph == unicodeString[0])
-          return NSLocalizedString(([NSString stringWithFormat:@"%s", mapOfNamesForUnicodeGlyphs[i].name, nil]), @"Friendly Key Name");
-
-        i++;
-      }
-
-      return [NSString stringWithCharacters:unicodeString length:(NSInteger)actualStringLength];
-    } else
-      NSLog(@"Couldn't find a translation for the '%d' key code", keyCode);
-  } else
-    NSLog(@"Couldn't find a suitable keyboard layout from which to translate");
-
-  return nil;
-}
-
-// This is a temporary solution, TODO: refactor
-char * keycodeToString(int keycode){
-  if (keycode == 1) return "a";
-  else if (keycode == 2) return "b";
-  else if (keycode == 3) return "c";
-  else if (keycode == 4) return "d";
-  else if (keycode == 5) return "e";
-  else if (keycode == 6) return "f";
-  else if (keycode == 7) return "g";
-  else if (keycode == 8) return "g";
-  else if (keycode == 9) return "i";
-  return "unknown";
-}
-
+// Method for converting keynames to keycodes, utilized only in test scenarios.
 // This is a temporary solution, TODO: refactor
 int charToKeycode(char * c){
   if (strcmp(c, "a")==0) return 1;
@@ -169,15 +77,13 @@ int charToKeycode(char * c){
 }
 
 bool grabbing = false;
-
 bool hit = false;
 
-bool process_key_event(int keycode , int type){
+bool process_key_event(int keycode , char * keyname, int type){
   hit = true;
   int quit_key = -998  ; // TODO: assign proper quit key
   int super_key = -999 ; // TODO: assign proper super key (probably a modifier)
 
-  char * key = keycodeToString(keycode);
   switch(type) {
 
     case 10: // KeyPress; TODO: improve readability
@@ -186,7 +92,7 @@ bool process_key_event(int keycode , int type){
         return true;
       } else if (grabbing){
         // send key_press to the event_dispatcher
-        rb_funcall(event_dispatcher, rb_intern("signal"), 2, rb_str_new2("key_press"), rb_str_new2(key));
+        rb_funcall(event_dispatcher, rb_intern("signal"), 2, rb_str_new2("key_press"), rb_str_new2(keyname));
         return true;
       } else {
         return false;
@@ -203,7 +109,7 @@ bool process_key_event(int keycode , int type){
         return true;
       } else if (grabbing == true){
         // send key_release to the event_dispatcher
-        rb_funcall(event_dispatcher, rb_intern("signal"), 2, rb_str_new2("key_release"), rb_str_new2(key));
+        rb_funcall(event_dispatcher, rb_intern("signal"), 2, rb_str_new2("key_release"), rb_str_new2(keyname));
         return true;
       } else {
         return false;
@@ -237,6 +143,14 @@ CGEventRef myCGEventCallback(CGEventTapProxy proxy, CGEventType type,
   CGKeyCode keycode = (CGKeyCode)CGEventGetIntegerValueField(
       event, kCGKeyboardEventKeycode);
 
+  CGKeyCode keyboardType = (CGKeyCode)CGEventGetIntegerValueField(
+      event, kCGKeyboardEventKeyboardType);
+
+  UniChar unicodeString[10];
+  UniCharCount actualStringLength;
+
+  NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+
   // Uncomment to debug.
   // printf("Received keycode: %d.", keycode);
   // fflush(0);
@@ -244,7 +158,10 @@ CGEventRef myCGEventCallback(CGEventTapProxy proxy, CGEventType type,
   event_keycode = (int)keycode;
   event_type = (int)type;
 
-  if (process_key_event(keycode, type))
+  NSString * ns_string = [NSString stringWithFormat:@"%s", unicodeString];
+  char * keyname = [ns_string UTF8String];
+
+  if (process_key_event(keycode, keyname, type))
     return 0;
   else
     return event;
@@ -297,7 +214,7 @@ VALUE method_grab_keyboard(VALUE self, VALUE new_event_dispatcher){
         test_queued = false;
         grabbing = true;
 
-        process_key_event(event_keycode, event_type);
+        process_key_event(event_keycode, STR2CSTR(test_key), event_type);
       } else {
 
         // Set it all running.
