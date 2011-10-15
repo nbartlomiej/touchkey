@@ -200,27 +200,26 @@ VALUE method_grab_keyboard(VALUE self, VALUE new_event_dispatcher){
   for (should_release_keyboard = false; should_release_keyboard == false; ) {
     hit = false;
 
-    // if (test_queued == true ){ //|| // TODO: XPending(display) > 0){
-      // there is an event to process
-      if (test_queued == true){
-        // just testing
-        event_keycode = charToKeycode(STR2CSTR(test_key));// TODO: XKeysymToKeycode(display, XStringToKeysym(STR2CSTR(test_key)));
-        event_type = NUM2INT(test_event_type);
+    // there is an event to process
+    if (test_queued == true){
+      // just testing
+      event_keycode = charToKeycode(STR2CSTR(test_key));
+      event_type = NUM2INT(test_event_type);
 
-        // doing only one keypress and quitting
-        should_release_keyboard = true ;
+      // doing only one keypress and quitting
+      should_release_keyboard = true ;
 
-        // marking the test as done
-        test_queued = false;
-        grabbing = true;
+      // marking the test as done
+      test_queued = false;
+      grabbing = true;
 
-        process_key_event(event_keycode, STR2CSTR(test_key), event_type);
-      } else {
+      process_key_event(event_keycode, STR2CSTR(test_key), event_type);
+    } else {
 
-        // Set it all running.
-        int returnValue = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.01, false);
+      // Set it all running.
+      int returnValue = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.01, false);
 
-      }
+    }
     if (!hit) {
       if (test_idle_queued > 0){
         // oh, we're testing idleness
